@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stem</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <header>
+            <h1>UniRiego</h1>
+            <div class="actions">
+                <span id="status">loading...</span>
+                <button id="record-btn">Record</button>
+            </div>
+        </header>
+        <div class="grid">
+            <div class="card">
+                <div class="label">Moisture (%)</div>
+                <div class="val" id="hum">--</div>
+                <svg
+                    class="spark"
+                    id="g-hum"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">Temperature (°C)</div>
+                <div class="val" id="temp">--</div>
+                <svg
+                    class="spark"
+                    id="g-temp"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">EC (µS/cm)</div>
+                <div class="val" id="ec">--</div>
+                <svg
+                    class="spark"
+                    id="g-ec"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">pH</div>
+                <div class="val" id="ph">--</div>
+                <svg
+                    class="spark"
+                    id="g-ph"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">N (mg/kg)</div>
+                <div class="val" id="n">--</div>
+                <svg
+                    class="spark"
+                    id="g-n"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">P (mg/kg)</div>
+                <div class="val" id="p">--</div>
+                <svg
+                    class="spark"
+                    id="g-p"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">K (mg/kg)</div>
+                <div class="val" id="k">--</div>
+                <svg
+                    class="spark"
+                    id="g-k"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+            <div class="card">
+                <div class="label">Fertility</div>
+                <div class="val" id="fert">--</div>
+                <svg
+                    class="spark"
+                    id="g-fert"
+                    viewBox="0 0 100 24"
+                    preserveAspectRatio="none"
+                >
+                    <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                    />
+                </svg>
+            </div>
+        </div>
+        <section id="records-section" hidden>
+            <h2>Records</h2>
+            <div id="records"></div>
+        </section>
+        <dialog id="chart-modal">
+            <div class="modal-head">
+                <span id="modal-title"></span>
+                <span id="modal-val"></span>
+            </div>
+            <svg id="modal-svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+                <polyline fill="none" stroke="currentColor" stroke-width="2" />
+            </svg>
+            <div class="modal-meta">
+                <span id="modal-start"></span>
+                <span id="modal-range"></span>
+                <span id="modal-end"></span>
+            </div>
+        </dialog>
+        <script src="app.js"></script>
+    </body>
+</html>
