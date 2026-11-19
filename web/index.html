@@ -1,22 +1,54 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Stem</title>
+        <title>Fertilifix · Ferty Bot</title>
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <header>
             <h1>UniRiego</h1>
             <div class="actions">
-                <span id="status">loading...</span>
-                <button id="record-btn">Record</button>
+                <span id="status">Esperando sensor…</span>
+                <button id="record-btn">Guardar lectura</button>
+                <button id="chat-toggle" type="button" aria-expanded="false" aria-controls="chatbot">
+                    <span class="mascot-mini-wrap">
+                        <svg class="mascot-static-avatar" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                            <defs>
+                                <radialGradient id="mascot-toggle-sheen" cx="32%" cy="24%" r="78%">
+                                    <stop offset="0" stop-color="#ccfbf1" />
+                                    <stop offset="1" stop-color="#0f766e" />
+                                </radialGradient>
+                            </defs>
+                            <path class="mascot-sprout-stem" d="M32 18c-.2-5.3-.3-8.3-.2-11" />
+                            <path class="mascot-leaf mascot-leaf-left" d="M31.8 12.4C24.4 11.5 20 8.4 19.2 3.3c6.6-.1 11 2.8 12.6 9.1Z" />
+                            <path class="mascot-leaf mascot-leaf-right" d="M32.3 11.5c1.8-6 5.6-8.8 11.7-8.5-.5 5.5-4.4 8.8-11.7 8.5Z" />
+                            <path class="mascot-avatar-body" d="M32 13.5c-13.1 0-22.5 9.2-22.5 22.1 0 12.5 9.1 21.4 22.5 21.4s22.5-8.9 22.5-21.4c0-12.9-9.4-22.1-22.5-22.1Z" />
+                            <path class="mascot-avatar-shine" d="M17.1 28.2c1.7-4.4 4.5-7.3 8.4-8.7" />
+                            <g class="mascot-eyes">
+                                <ellipse class="mascot-eye-white" cx="23" cy="33" rx="6.6" ry="8.2" />
+                                <ellipse class="mascot-eye-white" cx="41" cy="33" rx="6.6" ry="8.2" />
+                                <g class="mascot-pupils">
+                                    <circle cx="23.7" cy="33.6" r="3.3" />
+                                    <circle cx="41.7" cy="33.6" r="3.3" />
+                                </g>
+                            </g>
+                            <ellipse class="mascot-blush" cx="13.8" cy="41.4" rx="2.4" ry="1.2" />
+                            <ellipse class="mascot-blush" cx="50.2" cy="41.4" rx="2.4" ry="1.2" />
+                            <path class="mascot-avatar-mouth" d="M27 45c3.2 3.2 6.8 3.2 10 0" />
+                        </svg>
+                    </span>
+                    <span class="chat-toggle-copy">
+                        <span>Ferty Bot</span>
+                        <time id="chat-toggle-clock" class="chat-toggle-clock" aria-label="Hora local">--:--</time>
+                    </span>
+                </button>
             </div>
         </header>
         <div class="grid">
             <div class="card">
-                <div class="label">Moisture (%)</div>
+                <div class="label">Humedad (%)</div>
                 <div class="val" id="hum">--</div>
                 <svg
                     class="spark"
@@ -32,7 +64,7 @@
                 </svg>
             </div>
             <div class="card">
-                <div class="label">Temperature (°C)</div>
+                <div class="label">Temperatura (°C)</div>
                 <div class="val" id="temp">--</div>
                 <svg
                     class="spark"
@@ -48,7 +80,7 @@
                 </svg>
             </div>
             <div class="card">
-                <div class="label">EC (µS/cm)</div>
+                <div class="label">Conductividad eléctrica (EC, µS/cm)</div>
                 <div class="val" id="ec">--</div>
                 <svg
                     class="spark"
@@ -80,7 +112,7 @@
                 </svg>
             </div>
             <div class="card">
-                <div class="label">N (mg/kg)</div>
+                <div class="label">Nitrógeno (N, mg/kg)</div>
                 <div class="val" id="n">--</div>
                 <svg
                     class="spark"
@@ -96,7 +128,7 @@
                 </svg>
             </div>
             <div class="card">
-                <div class="label">P (mg/kg)</div>
+                <div class="label">Fósforo (P, mg/kg)</div>
                 <div class="val" id="p">--</div>
                 <svg
                     class="spark"
@@ -112,7 +144,7 @@
                 </svg>
             </div>
             <div class="card">
-                <div class="label">K (mg/kg)</div>
+                <div class="label">Potasio (K, mg/kg)</div>
                 <div class="val" id="k">--</div>
                 <svg
                     class="spark"
@@ -128,7 +160,7 @@
                 </svg>
             </div>
             <div class="card">
-                <div class="label">Fertility</div>
+                <div class="label">Fertilidad (FERT)</div>
                 <div class="val" id="fert">--</div>
                 <svg
                     class="spark"
@@ -144,24 +176,254 @@
                 </svg>
             </div>
         </div>
-        <section id="records-section" hidden>
-            <h2>Records</h2>
-            <div id="records"></div>
+        <section id="dashboard-support" aria-label="Promedios e historial">
+            <section id="metric-detail-panel" class="metric-detail-panel" aria-labelledby="metric-panel-title" hidden>
+                <div class="metric-panel-head">
+                    <div>
+                        <h2 id="metric-panel-title"></h2>
+                        <p class="chart-current">Lectura actual: <strong id="metric-panel-value">—</strong> <span id="metric-panel-unit"></span></p>
+                    </div>
+                    <button id="metric-panel-close" class="secondary-button" type="button" aria-label="Cerrar detalle de medición">×</button>
+                </div>
+                <section id="metric-recommendation" class="metric-recommendation" aria-labelledby="metric-recommendation-title" hidden>
+                    <h3 id="metric-recommendation-title">Recomendación para este indicador</h3>
+                    <p id="metric-recommendation-text"></p>
+                </section>
+                <div id="metric-chart-view">
+                    <div class="chart-controls">
+                        <span>Periodo</span>
+                        <div class="chart-window-group" role="group" aria-label="Periodo de la gráfica">
+                            <button type="button" data-chart-window="5" aria-pressed="false">5m</button>
+                            <button type="button" data-chart-window="10" aria-pressed="false">10m</button>
+                            <button type="button" data-chart-window="20" aria-pressed="true">20m</button>
+                        </div>
+                    </div>
+                    <p class="chart-session-note">Vista completa de las lecturas recibidas en los últimos 20 minutos de esta sesión.</p>
+                    <div class="chart-visual">
+                        <svg id="metric-chart-svg" viewBox="0 0 640 250" role="img" aria-label="Gráfica cronológica de la medición" preserveAspectRatio="none">
+                            <g class="chart-grid" aria-hidden="true">
+                                <line x1="58" y1="24" x2="625" y2="24" />
+                                <line x1="58" y1="70.5" x2="625" y2="70.5" />
+                                <line x1="58" y1="117" x2="625" y2="117" />
+                                <line x1="58" y1="163.5" x2="625" y2="163.5" />
+                                <line x1="58" y1="210" x2="625" y2="210" />
+                                <line x1="58" y1="24" x2="58" y2="210" />
+                            </g>
+                            <g class="chart-axis-labels" aria-hidden="true">
+                                <text id="chart-y-0" x="50" y="28" text-anchor="end">—</text>
+                                <text id="chart-y-1" x="50" y="74.5" text-anchor="end">—</text>
+                                <text id="chart-y-2" x="50" y="121" text-anchor="end">—</text>
+                                <text id="chart-y-3" x="50" y="167.5" text-anchor="end">—</text>
+                                <text id="chart-y-4" x="50" y="214" text-anchor="end">—</text>
+                            </g>
+                            <path id="metric-chart-line" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle id="metric-chart-latest-dot" r="5" cx="58" cy="210" />
+                        </svg>
+                        <p id="metric-chart-empty" class="chart-empty" hidden>Aún no hay lecturas en este periodo.</p>
+                        <div class="chart-time-axis" aria-label="Marcas de tiempo">
+                            <span id="chart-time-start">—</span>
+                            <span id="chart-time-middle">—</span>
+                            <span id="chart-time-end">—</span>
+                        </div>
+                    </div>
+                    <p id="metric-chart-summary" class="chart-summary" aria-live="polite"></p>
+                </div>
+            </section>
+            <section class="averages-summary" aria-labelledby="averages-title">
+                <h2 id="averages-title">Promedios de lecturas recientes</h2>
+                <p class="average-caption">Se calculan con hasta 30 lecturas recibidas desde que abriste esta página.</p>
+                <div class="average-grid">
+                    <div class="average-item"><span>Humedad (%)</span><strong id="avg-hum">—</strong><small id="avg-count-hum">0 lecturas</small></div>
+                    <div class="average-item"><span>Temperatura (°C)</span><strong id="avg-temp">—</strong><small id="avg-count-temp">0 lecturas</small></div>
+                    <div class="average-item"><span>EC (µS/cm)</span><strong id="avg-ec">—</strong><small id="avg-count-ec">0 lecturas</small></div>
+                    <div class="average-item"><span>pH</span><strong id="avg-ph">—</strong><small id="avg-count-ph">0 lecturas</small></div>
+                    <div class="average-item"><span>N (mg/kg)</span><strong id="avg-n">—</strong><small id="avg-count-n">0 lecturas</small></div>
+                    <div class="average-item"><span>P (mg/kg)</span><strong id="avg-p">—</strong><small id="avg-count-p">0 lecturas</small></div>
+                    <div class="average-item"><span>K (mg/kg)</span><strong id="avg-k">—</strong><small id="avg-count-k">0 lecturas</small></div>
+                    <div class="average-item"><span>Fertilidad (FERT)</span><strong id="avg-fert">—</strong><small id="avg-count-fert">0 lecturas</small></div>
+                </div>
+            </section>
+            <details id="records-section">
+                <summary>
+                    <span>Historial de lecturas</span>
+                    <span id="records-count">0 guardadas</span>
+                </summary>
+                <div class="records-content">
+                    <div class="records-toolbar">
+                        <p>Registros guardados</p>
+                        <button id="clear-records" class="secondary-button" type="button" disabled>Vaciar historial</button>
+                    </div>
+                    <div id="records"></div>
+                </div>
+            </details>
         </section>
-        <dialog id="chart-modal">
-            <div class="modal-head">
-                <span id="modal-title"></span>
-                <span id="modal-val"></span>
+        <section id="chatbot" class="chatbot" hidden aria-label="Ferty Bot">
+            <div class="chatbot-head">
+                <div class="chatbot-brand">
+                    <div class="mascot-avatar-wrap">
+                        <button id="mascot-avatar-action" class="mascot-avatar-button" type="button" aria-label="Animar a Ferty Bot">
+                            <svg class="mascot-avatar" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                                <defs>
+                                    <radialGradient id="mascot-avatar-sheen" cx="32%" cy="24%" r="78%">
+                                        <stop offset="0" stop-color="#ccfbf1" />
+                                        <stop offset="1" stop-color="#0f766e" />
+                                    </radialGradient>
+                                </defs>
+                                <path class="mascot-sprout-stem" d="M32 18c-.2-5.3-.3-8.3-.2-11" />
+                                <path class="mascot-leaf mascot-leaf-left" d="M31.8 12.4C24.4 11.5 20 8.4 19.2 3.3c6.6-.1 11 2.8 12.6 9.1Z" />
+                                <path class="mascot-leaf mascot-leaf-right" d="M32.3 11.5c1.8-6 5.6-8.8 11.7-8.5-.5 5.5-4.4 8.8-11.7 8.5Z" />
+                                <path class="mascot-avatar-body" d="M32 13.5c-13.1 0-22.5 9.2-22.5 22.1 0 12.5 9.1 21.4 22.5 21.4s22.5-8.9 22.5-21.4c0-12.9-9.4-22.1-22.5-22.1Z" />
+                                <path class="mascot-avatar-shine" d="M17.1 28.2c1.7-4.4 4.5-7.3 8.4-8.7" />
+                                <g class="mascot-eyes">
+                                    <ellipse class="mascot-eye-white" cx="23" cy="33" rx="6.6" ry="8.2" />
+                                    <ellipse class="mascot-eye-white" cx="41" cy="33" rx="6.6" ry="8.2" />
+                                    <g class="mascot-pupils">
+                                        <circle cx="23.7" cy="33.6" r="3.3" />
+                                        <circle cx="41.7" cy="33.6" r="3.3" />
+                                    </g>
+                                </g>
+                                <ellipse class="mascot-blush" cx="13.8" cy="41.4" rx="2.4" ry="1.2" />
+                                <ellipse class="mascot-blush" cx="50.2" cy="41.4" rx="2.4" ry="1.2" />
+                                <path class="mascot-avatar-mouth" d="M27 45c3.2 3.2 6.8 3.2 10 0" />
+                            </svg>
+                        </button>
+                        <span class="mascot-thinking" aria-hidden="true"><i></i><i></i><i></i></span>
+                        <span class="mascot-egg-burst" aria-hidden="true">
+                            <i class="mascot-egg-top"></i><i class="mascot-egg-bottom"></i>
+                            <b>✦</b><b>✦</b><b>·</b>
+                        </span>
+                    </div>
+                    <div>
+                        <h2>Ferty Bot</h2>
+                        <p>Combinemos la foto y las mediciones de tu planta.</p>
+                    </div>
+                </div>
+                <button id="chat-close" type="button" aria-label="Cerrar Ferty Bot">
+                    ×
+                </button>
             </div>
-            <svg id="modal-svg" viewBox="0 0 300 120" preserveAspectRatio="none">
-                <polyline fill="none" stroke="currentColor" stroke-width="2" />
-            </svg>
-            <div class="modal-meta">
-                <span id="modal-start"></span>
-                <span id="modal-range"></span>
-                <span id="modal-end"></span>
+            <section class="saved-plants" aria-labelledby="saved-plants-title">
+                <h3 id="saved-plants-title">Mis plantas</h3>
+                <div class="saved-plants-controls">
+                    <label for="saved-plant-select">Planta guardada
+                        <select id="saved-plant-select" aria-label="Seleccionar una planta guardada">
+                            <option value="">Selecciona una planta</option>
+                        </select>
+                    </label>
+                    <button id="saved-plant-save" class="secondary-button" type="button" disabled>Guardar planta</button>
+                    <button id="saved-plant-rename" class="secondary-button" type="button" disabled>Cambiar nombre</button>
+                    <button id="saved-plant-new" class="text-button" type="button">Nueva planta</button>
+                </div>
+                <form id="saved-plant-rename-form" class="saved-plant-rename-form" hidden>
+                    <label for="saved-plant-name">Nombre para identificarla
+                        <input id="saved-plant-name" type="text" maxlength="60" required />
+                    </label>
+                    <button class="primary-button" type="submit">Guardar nombre</button>
+                    <button id="saved-plant-rename-cancel" class="secondary-button" type="button">Cancelar</button>
+                </form>
+                <p id="saved-plant-status" class="saved-plant-status" role="status" aria-live="polite" hidden></p>
+            </section>
+            <section class="plant-vision" aria-labelledby="plant-vision-heading">
+                <div class="plant-vision-head">
+                    <div>
+                        <h3 id="plant-vision-heading">Identifica tu planta con una foto</h3>
+                    </div>
+                    <div class="plant-vision-actions">
+                        <button id="plant-image-select" class="secondary-button" type="button" aria-controls="plant-image-input">Subir imagen</button>
+                        <button id="plant-manual-start" class="text-button" type="button">Ingresar planta manualmente</button>
+                    </div>
+                    <input id="plant-image-input" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" />
+                </div>
+                <ol id="plant-scan-progress" class="plant-scan-progress" aria-label="Fases del análisis visual" hidden>
+                    <li data-phase="plant" aria-current="step"><span>1</span> Planta</li>
+                    <li data-phase="state"><span>2</span> Etapa y señales</li>
+                    <li data-phase="recommendations"><span>3</span> Recomendaciones</li>
+                </ol>
+                <p id="plant-scan-status" class="plant-scan-status" role="status" aria-live="polite" hidden></p>
+                <p id="plant-image-upload-error" class="plant-image-upload-error" role="alert" hidden></p>
+                <div id="plant-image-card" class="plant-image-card" hidden>
+                    <div id="plant-image-wrap" class="plant-image-wrap">
+                        <img id="plant-image-preview" class="plant-image-preview" alt="Foto seleccionada para identificar la planta" />
+                        <div id="plant-image-loading" class="plant-image-loading" aria-hidden="true" hidden>
+                            <span class="plant-image-spinner"></span>
+                            <span id="plant-image-loading-text">Analizando foto…</span>
+                        </div>
+                    </div>
+                    <div class="plant-image-controls">
+                        <p id="plant-image-status" role="status" aria-live="polite"></p>
+                        <div>
+                            <button id="plant-image-retry" class="secondary-button" type="button" hidden>Analizar de nuevo</button>
+                            <button id="plant-image-remove" class="secondary-button" type="button">Quitar foto</button>
+                        </div>
+                    </div>
+                    <section id="plant-identification" class="plant-identification" aria-label="Resultado de identificación" hidden>
+                        <h4 id="plant-result-name"></h4>
+                        <p id="plant-result-scientific" class="plant-result-scientific"></p>
+                        <p id="plant-result-confidence-row" class="plant-result-confidence">Coincidencia: <strong id="plant-result-confidence"></strong></p>
+                        <p id="plant-confidence-warning" class="plant-confidence-warning" role="status" hidden></p>
+                        <div class="plant-scan-actions">
+                            <button id="plant-use-identification" class="primary-button" type="button">Confirmar planta</button>
+                            <button id="plant-correct-plant" class="secondary-button" type="button">No es esta planta</button>
+                        </div>
+                        <form id="plant-crop-correction" class="plant-crop-correction" hidden>
+                            <label for="plant-crop-correction-input">Escribe el tipo de planta
+                                <input id="plant-crop-correction-input" type="text" maxlength="60" placeholder="Ej. rosa del desierto" />
+                            </label>
+                            <button class="primary-button" type="submit">Analizar esta planta</button>
+                        </form>
+                    </section>
+                    <section id="plant-state-result" class="plant-state-result" aria-label="Etapa y señales visibles" hidden>
+                        <h4>Etapa y señales visibles</h4>
+                        <p id="plant-stage-label" class="plant-stage-label"></p>
+                        <p class="plant-result-confidence">Coincidencia de etapa: <strong id="plant-stage-confidence"></strong></p>
+                        <p id="plant-stage-reason" class="plant-confidence-warning" hidden></p>
+                        <p id="plant-visual-summary" class="plant-visual-summary"></p>
+                        <ul id="plant-visual-findings" class="plant-visual-findings"></ul>
+                        <div class="plant-scan-actions">
+                            <button id="plant-confirm-stage" class="primary-button" type="button">Confirmar etapa</button>
+                            <button id="plant-stage-manual" class="secondary-button" type="button">Elegir etapa manualmente</button>
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <form id="chat-setup" class="chat-settings" hidden>
+                <p class="setup-intro">Completa dónde está la planta. Si la foto no permitió confirmar su etapa, el asesor te preguntará.</p>
+                <label for="chat-crop">Planta o cultivo
+                    <input id="chat-crop" type="text" maxlength="60" placeholder="Ej. rosa del desierto" required />
+                </label>
+                <label for="chat-location">Ciudad o municipio de la planta
+                    <input id="chat-location" type="text" maxlength="160" placeholder="Ej. Puebla, México" required />
+                </label>
+                <p id="setup-error" class="form-error" role="alert" hidden></p>
+                <button id="chat-start" class="primary-button" type="submit">Continuar a recomendaciones</button>
+            </form>
+            <div id="chat-conversation" hidden>
+                <div class="chat-context">
+                    <p id="chat-profile-summary"></p>
+                    <button id="chat-edit" class="secondary-button" type="button">Cambiar planta o lugar</button>
+                </div>
+                <p id="chat-step" class="chat-step" role="status"></p>
+                <div id="chat-messages" class="chat-messages" role="log" aria-label="Conversación con el asesor" aria-live="polite"></div>
+                <div id="chat-options" class="chat-options" role="group" aria-label="Opciones para responder" hidden></div>
+                <form id="chat-form" class="chat-form">
+                    <label class="sr-only" for="chat-input">Pregunta o descripción de tu planta</label>
+                    <input
+                        id="chat-input"
+                        type="text"
+                        maxlength="500"
+                        autocomplete="off"
+                        placeholder="También puedes preguntar cómo reconocer la etapa"
+                        required
+                    />
+                    <button type="submit">Enviar</button>
+                </form>
+                <button id="chat-retry" class="secondary-button chat-retry" type="button" hidden>Reintentar consulta</button>
             </div>
-        </dialog>
+        </section>
         <script src="app.js"></script>
+        <script src="assessment.js"></script>
+        <script src="mascot.js"></script>
+        <script src="advisor.js"></script>
+        <script src="vision.js"></script>
     </body>
 </html>
